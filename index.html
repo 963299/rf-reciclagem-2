@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a1220">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RF Reciclagem 2">
+<link rel="manifest" href="manifest.json">
+<title>RF Reciclagem 2</title>
+<style>
+
+:root {
+  --blue:#3b9eff; --blue-dark:#1a5fa8; --blue-dim:#0f2d54; --blue-mid:#1a4a80;
+  --bg:#070d18; --bg2:#0a1220; --bg3:#0e1a2e;
+  --border:#162540; --text:#deeeff; --text-dim:#5a85b8;
+  --accent:#3b9eff; --red:#e74c3c; --wapp:#3b9eff; --card:#0b1525;
+  --purp:#7ab8ff; --purp-bg:#091528; --purp-border:#1a3050;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Arial',sans-serif;min-height:100vh;padding-bottom:90px;}
+
+/* HEADER */
+header{background:var(--bg2);border-bottom:2px solid var(--blue-dim);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{font-family:'Arial Narrow','Arial',sans-serif;font-weight:800;font-size:1.6rem;letter-spacing:1px;color:var(--blue);}
+.logo span{color:var(--text-dim);font-weight:400;font-size:0.9rem;display:block;letter-spacing:2px;text-transform:uppercase;}
+.date-badge{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:0.82rem;color:var(--text-dim);}
+
+/* NAV */
+nav{display:flex;gap:4px;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;}
+nav button{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:'Arial Narrow','Arial',sans-serif;font-weight:600;font-size:0.85rem;padding:7px 14px;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .15s;}
+nav button.active,nav button:hover{background:var(--blue-dim);border-color:var(--blue);color:var(--text);}
+
+/* PAGES */
+.page{display:none;padding:16px;max-width:720px;margin:0 auto;}
+.page.active{display:block;}
+h2{font-family:'Arial Narrow','Arial',sans-serif;font-size:1.4rem;font-weight:700;color:var(--blue);letter-spacing:.5px;margin-bottom:14px;}
+
+/* INPUTS */
+input[type="number"],input[type="text"],input[type="date"]{background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:'Arial',sans-serif;font-size:.9rem;padding:7px 10px;width:100%;transition:border-color .15s;}
+input:focus{outline:none;border-color:var(--blue);}
+.price-input{width:90px;text-align:right;}
+
+/* BUTTONS */
+button.btn{background:var(--blue-dim);border:1px solid var(--blue);color:var(--text);font-family:'Arial Narrow','Arial',sans-serif;font-weight:700;font-size:.9rem;letter-spacing:.5px;padding:8px 16px;border-radius:5px;cursor:pointer;transition:all .15s;}
+button.btn:hover{background:var(--blue);}
+button.btn.red{background:#2d0f0f;border-color:var(--red);color:#ffaaaa;}
+button.btn.red:hover{background:var(--red);color:#fff;}
+button.btn.orange{background:var(--blue-dim);border-color:var(--blue);color:var(--text-dim);}
+button.btn.orange:hover{background:var(--blue-mid);color:var(--text);}
+button.btn.wapp{background:var(--blue-dim);border-color:var(--blue);color:var(--blue);}
+button.btn.wapp:hover{background:var(--blue);color:#fff;}
+button.btn.full{width:100%;padding:12px;font-size:1rem;}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px;}
+.section-label{font-family:'Arial Narrow','Arial',sans-serif;font-weight:600;color:var(--text-dim);font-size:.78rem;text-transform:uppercase;letter-spacing:1.5px;margin:12px 0 6px;}
+
+/* MATERIAL BLOCKS */
+.mat-block{background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden;}
+.mat-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;background:var(--bg3);user-select:none;transition:background .1s;}
+.mat-header:hover{background:var(--blue-dim);}
+.mat-header-name{font-family:'Arial Narrow','Arial',sans-serif;font-weight:700;font-size:1.05rem;}
+.mat-header-price{font-size:.78rem;color:var(--text-dim);margin-top:2px;}
+.mat-total{font-family:'Arial Narrow','Arial',sans-serif;font-weight:700;font-size:1rem;color:var(--blue);}
+.chevron{transition:transform .2s;display:inline-block;color:var(--text-dim);}
+.chevron.open{transform:rotate(90deg);}
+.mat-body{padding:14px 16px;}
+.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.7rem;font-weight:600;background:var(--blue-dim);color:var(--blue);margin-left:6px;}
+.pill.empty{background:#111;color:#555;}
+
+/* BAGS */
+.bag-item{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.bag-num{font-family:'Arial Narrow','Arial',sans-serif;color:var(--text-dim);font-size:.85rem;width:22px;flex-shrink:0;}
+.bag-item input{flex:1;}
+.bag-del{background:transparent;border:1px solid #2d0f0f;color:var(--red);border-radius:4px;cursor:pointer;padding:5px 8px;font-size:.8rem;transition:all .1s;flex-shrink:0;}
+.bag-del:hover{background:var(--red);color:#fff;}
+.add-bag-row{display:flex;gap:8px;align-items:center;margin-top:6px;}
+.add-bag-row input{flex:1;}
+.bag-sum-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg);border-radius:5px;margin-top:10px;border:1px solid var(--border);}
+.bag-sum-label{font-size:.8rem;color:var(--text-dim);}
+.bag-sum-val{font-family:'Arial Narrow','Arial',sans-serif;font-weight:700;color:var(--blue);}
+
+/* DEVOLUÇÕES */
+.dev-section{background:var(--card);border:1px solid var(--purp-border);border-radius:8px;margin-bottom:10px;overflow:hidden;}
+.dev-header{background:var(--purp-bg);border-bottom:1px solid var(--purp-border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
+.dev-title{font-family:'Arial Narrow','Arial',sans-serif;font-weight:700;font-size:.95rem;color:var(--purp);letter-spacing:.5px;}
+.dev-total{font-family:'Arial Narrow','Arial',sans-serif;font-weight:700;font-size:.95rem;color:var(--red);}
+.dev-body{padding:12px 16px;}
+.dev-item{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:.85rem;}
+.dev-item:last-child{border:none;}
+.dev-item-val{color:var(--red);font-weight:600;text-align:right;}
+.dev-item-del{background:transparent;border:1px solid #2d0f0f;color:var(--red);border-radius:4px;cursor:pointer;padding:3px 7px;font-size:.75rem;transition:all .1s;}
+.dev-item-del:hover{background:var(--red);color:#fff;}
+.add-dev-row{display:grid;grid-template-columns:2fr 1fr auto;gap:8px;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+
+/* SAVE ROW */
+.save-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+
+/* TOTAL BAR */
+.total-bar{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:2px solid var(--blue);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;z-index:100;}
+.total-bar-label{font-size:.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;}
+.total-bar-value{font-family:'Arial Narrow','Arial',sans-serif;font-weight:800;font-size:1.8rem;color:var(--blue);}
+.total-liq{font-family:'Arial Narrow','Arial',sans-serif;font-weight:800;font-size:1.1rem;color:var(--purp);text-align:right;}
+.total-liq-label{font-size:.7rem;color:var(--purp);margin-top:1px;}
+
+/* PREÇOS */
+.mat-row-price{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.mat-row-price:last-child{border:none;}
+
+/* HISTÓRICO */
+.hist-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+.hist-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.hist-nome{font-family:'Arial Narrow','Arial',sans-serif;font-weight:700;font-size:1.1rem;}
+.hist-date{font-size:.8rem;color:var(--text-dim);margin-top:2px;}
+.hist-total{font-family:'Arial Narrow','Arial',sans-serif;font-weight:800;font-size:1.2rem;color:var(--blue);text-align:right;}
+.hist-liq{font-family:'Arial Narrow','Arial',sans-serif;font-size:.85rem;color:var(--purp);margin-top:2px;text-align:right;}
+.subtotal-section{background:var(--bg3);border-radius:6px;padding:10px 12px;margin-top:6px;border:1px solid var(--border);}
+.sub-row{display:flex;justify-content:space-between;font-size:.82rem;padding:3px 0;border-bottom:1px solid var(--border);}
+.sub-row:last-child{border:none;}
+.sub-row .lbl{color:var(--text-dim);}
+.sub-row.total{font-weight:700;color:var(--blue);font-size:.9rem;}
+.sub-row.dev-row .lbl{color:var(--purp);}
+.sub-row.dev-row span{color:var(--red);}
+.sub-row.liq-row .lbl{color:var(--purp);font-weight:700;}
+.sub-row.liq-row span{color:var(--purp);font-weight:700;}
+.dev-divider{border-top:1px dashed var(--purp-border);margin:6px 0 4px;}
+.hist-actions{display:flex;gap:6px;margin-top:10px;}
+.hist-actions button{flex:1;padding:9px;font-size:.85rem;}
+.empty{text-align:center;color:var(--text-dim);padding:32px;font-size:.9rem;}
+</style>
+</head>
+<body>
+
+<div id="welcomeOverlay" onclick="closeWelcome()" style="position:fixed;inset:0;background:rgba(7,5,10,0.94);z-index:9999;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;cursor:pointer;transition:opacity .4s ease;">
+  <div style="font-family:'Arial Narrow','Arial',sans-serif;font-weight:800;font-size:1.6rem;color:#3b9eff;letter-spacing:.5px;line-height:1.4;">
+    BOM DIA MEU LOVE, EU TE AMO!!! ❤️
+  </div>
+</div>
+<script>
+  function closeWelcome(){
+    const el=document.getElementById('welcomeOverlay');
+    if(!el) return;
+    el.style.opacity='0';
+    setTimeout(()=>el.remove(),400);
+  }
+  setTimeout(closeWelcome,3000);
+</script>
+
+<header>
+  <div class="logo">RF <span>Reciclagem 2</span></div>
+  <div class="date-badge" id="hDate"></div>
+</header>
+
+<nav>
+  <button class="active" onclick="goTo('compra',this)">📦 Nova Compra</button>
+  <button onclick="goTo('precos',this)">💲 Preços</button>
+  <button onclick="goTo('historico',this)">📋 Histórico</button>
+  <button onclick="goTo('backup',this)">🔄 Backup</button>
+</nav>
+
+<!-- ===== COMPRA ===== -->
+<div class="page active" id="page-compra">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+    <h2 style="margin:0">Nova Compra</h2>
+    <input type="date" id="compraDate" style="width:148px;padding:6px 8px;font-size:.82rem;">
+  </div>
+
+  <div class="card" style="display:flex;align-items:center;gap:10px;padding:10px 14px;margin-bottom:10px;">
+    <span style="font-size:1.1rem;">🏷️</span>
+    <input type="text" id="compraNome" placeholder="Nome da folha (ex: João Silva, Fornecedor Pedro...)"
+      style="flex:1;font-size:.92rem;" oninput="ca.nome=this.value;saveCA()">
+  </div>
+
+  <div id="materiaisCompra"></div>
+
+  <!-- DEVOLUÇÕES -->
+  <div class="dev-section">
+    <div class="dev-header">
+      <span class="dev-title">↩️ Devoluções / Descontos</span>
+      <span class="dev-total" id="devTotalLabel">− R$ 0,00</span>
+    </div>
+    <div class="dev-body">
+      <div id="devLista"><div style="font-size:.8rem;color:var(--text-dim);padding:4px 0;">Nenhuma devolução.</div></div>
+      <div class="add-dev-row">
+        <input type="text" id="devNome" placeholder="Material / motivo">
+        <input type="number" id="devValor" placeholder="R$ valor" step="0.01" min="0"
+          onkeydown="if(event.key==='Enter')addDev()">
+        <button class="btn red" onclick="addDev()" style="padding:7px 12px;white-space:nowrap;">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AÇÕES -->
+  <div class="save-row">
+    <button class="btn orange" onclick="limparCompra()" style="flex:0 0 auto;">🗑 Limpar</button>
+    <button class="btn wapp" onclick="compartilharAtual()" style="flex:1;"><?xml version="1.0"?>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:5px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      WhatsApp
+    </button>
+    <button class="btn full" onclick="salvarCompra()" style="flex:1 0 100%;margin-top:0;">💾 Salvar Folha</button>
+  </div>
+</div>
+
+<!-- ===== PREÇOS ===== -->
+<div class="page" id="page-precos">
+  <h2>Preços por Kg</h2>
+  <div class="card" id="precosLista"></div>
+  <button class="btn full" onclick="salvarPrecos()">💾 Salvar Preços</button>
+  <p style="text-align:center;font-size:.75rem;color:var(--text-dim);margin-top:10px;">Alterações valem a partir da próxima compra</p>
+</div>
+
+<!-- ===== HISTÓRICO ===== -->
+<div class="page" id="page-historico">
+  <h2>Histórico de Compras</h2>
+  <div id="historicoLista"></div>
+</div>
+
+<!-- ===== BACKUP ===== -->
+<div class="page" id="page-backup">
+  <h2>Backup dos Dados</h2>
+
+  <div class="card">
+    <div class="section-label" style="margin-top:0;">Exportar</div>
+    <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:10px;">
+      Gera um código com todo o histórico de compras e os preços salvos. Guarde esse código
+      (mande pra você mesmo no WhatsApp, por exemplo) antes de trocar de aparelho ou reinstalar o app.
+    </p>
+    <div class="save-row" style="margin-top:0;">
+      <button class="btn full" onclick="gerarBackup()">📤 Gerar código de backup</button>
+    </div>
+    <textarea id="backupOut" readonly rows="4"
+      style="width:100%;margin-top:10px;display:none;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:monospace;font-size:.72rem;padding:8px;resize:vertical;"></textarea>
+    <div class="save-row" id="backupOutActions" style="display:none;">
+      <button class="btn" onclick="copiarBackup()" style="flex:1;">📋 Copiar código</button>
+      <button class="btn wapp" onclick="waBackup()" style="flex:1;">Enviar por WhatsApp</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label" style="margin-top:0;">Importar</div>
+    <p style="font-size:.82rem;color:var(--text-dim);margin-bottom:10px;">
+      Cole aqui o código de backup gerado anteriormente pra restaurar o histórico e os preços neste aparelho.
+    </p>
+    <textarea id="backupIn" rows="4" placeholder="Cole o código de backup aqui..."
+      style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:monospace;font-size:.72rem;padding:8px;resize:vertical;"></textarea>
+    <div class="save-row">
+      <button class="btn full" onclick="importarBackup()">📥 Restaurar backup</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOTAL BAR -->
+<div class="total-bar" id="totalBar">
+  <div>
+    <div class="total-bar-label" id="totalBarLabel">Total da compra</div>
+    <div class="total-liq-label" id="totalLiqLabel" style="display:none;"></div>
+  </div>
+  <div>
+    <div class="total-bar-value" id="totalGeral">R$ 0,00</div>
+    <div class="total-liq" id="totalLiq" style="display:none;"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DADOS
+// ============================================================
+const MATS_DEFAULT = [
+  {id:'pp_preto',   nome:'PP Preto',         preco:0},
+  {id:'pp_branco',  nome:'PP Branco',         preco:0},
+  {id:'pp_color',   nome:'PP Colorido',       preco:0},
+  {id:'pppad_col',  nome:'PP e PAD Colorido', preco:0},
+  {id:'pppad_bra',  nome:'PP e PAD Branco',   preco:0},
+  {id:'pe_branco',  nome:'PE Branco',         preco:0},
+  {id:'pe_color',   nome:'PE Colorido',       preco:0},
+  {id:'pet_mista',  nome:'PET Mista',         preco:0},
+  {id:'pet_triada', nome:'PET Triada',        preco:0},
+  {id:'pet_prensada', nome:'PET Prensada',    preco:0},
+  {id:'caixaria',   nome:'Caixaria',          preco:0},
+  {id:'caixaria_color', nome:'Caixaria Colorida', preco:0},
+];
+
+const WA_PATH = `M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z`;
+const WA_SVG = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:6px"><path d="${WA_PATH}"/></svg>`;
+
+function loadMats() {
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem('rf_mats')); } catch(e) { saved = null; }
+  if (!saved) return MATS_DEFAULT;
+  // Migração: acrescenta materiais novos que ainda não existem na lista salva, sem apagar os já configurados
+  const existingIds = new Set(saved.map(m => m.id));
+  MATS_DEFAULT.forEach(m => { if (!existingIds.has(m.id)) saved.push({...m}); });
+  // Reordena conforme MATS_DEFAULT, preservando os preços já salvos de cada material
+  const savedById = new Map(saved.map(m => [m.id, m]));
+  const ordenado = MATS_DEFAULT.map(m => savedById.get(m.id) || {...m});
+  // Mantém no final qualquer material salvo que não exista mais em MATS_DEFAULT (não perde nada)
+  const idsDefault = new Set(MATS_DEFAULT.map(m => m.id));
+  saved.forEach(m => { if (!idsDefault.has(m.id)) ordenado.push(m); });
+  return ordenado;
+}
+function saveMats(a)  { localStorage.setItem('rf_mats', JSON.stringify(a)); }
+function loadHist()   { try { return JSON.parse(localStorage.getItem('rf_hist')) || []; } catch(e) { return []; } }
+function saveHist(a)  { localStorage.setItem('rf_hist', JSON.stringify(a)); }
+function loadCA() {
+  try {
+    const s = localStorage.getItem('rf_ca');
+    if (s) return JSON.parse(s);
+  } catch(e) {}
+  return newCA();
+}
+function saveCA() { localStorage.setItem('rf_ca', JSON.stringify(ca)); }
+function newCA() {
+  const bags = {};
+  mats.forEach(m => bags[m.id] = []);
+  return {bags, date:today(), nome:'', devs:[]};
+}
+
+function today() { return new Date().toISOString().split('T')[0]; }
+function fmtD(d)  { const [y,m,dd]=d.split('-'); return `${dd}/${m}/${y}`; }
+function R$(v)    { return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+function pf(v)    { return parseFloat(v)||0; }
+
+// ============================================================
+// ESTADO GLOBAL
+// ============================================================
+let mats = loadMats();
+let ca   = loadCA();
+
+// ============================================================
+// NAV
+// ============================================================
+function goTo(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if (btn) btn.classList.add('active');
+  document.getElementById('totalBar').style.display = page==='compra' ? 'flex' : 'none';
+  if (page==='precos')    renderPrecos();
+  if (page==='historico') renderHist();
+}
+
+// ============================================================
+// BACKUP / RESTAURAR
+// ============================================================
+function gerarBackup() {
+  const dados = {
+    v: 1,
+    data: new Date().toISOString(),
+    mats: loadMats(),
+    hist: loadHist()
+  };
+  const json = JSON.stringify(dados);
+  const codigo = btoa(unescape(encodeURIComponent(json)));
+  const out = document.getElementById('backupOut');
+  out.value = codigo;
+  out.style.display = 'block';
+  document.getElementById('backupOutActions').style.display = 'flex';
+}
+
+function copiarBackup() {
+  const out = document.getElementById('backupOut');
+  if (!out.value) { alert('Gere o código primeiro.'); return; }
+  out.select();
+  out.setSelectionRange(0, 99999);
+  try {
+    document.execCommand('copy');
+    alert('✅ Código copiado! Cole em um bloco de notas ou envie pra você mesmo.');
+  } catch(e) {
+    navigator.clipboard && navigator.clipboard.writeText(out.value);
+    alert('✅ Código copiado!');
+  }
+}
+
+function waBackup() {
+  const out = document.getElementById('backupOut');
+  if (!out.value) { alert('Gere o código primeiro.'); return; }
+  const msg = `🔄 *BACKUP RF RECICLAGEM*\n📅 ${new Date().toLocaleDateString('pt-BR')}\n\nCole este código na aba Backup > Importar para restaurar:\n\n${out.value}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+function importarBackup() {
+  const txt = document.getElementById('backupIn').value.trim();
+  if (!txt) { alert('Cole o código de backup primeiro.'); return; }
+  let dados;
+  try {
+    const json = decodeURIComponent(escape(atob(txt)));
+    dados = JSON.parse(json);
+  } catch(e) {
+    alert('❌ Código inválido. Confira se copiou tudo certinho.');
+    return;
+  }
+  if (!dados || !dados.mats || !dados.hist) {
+    alert('❌ Código inválido ou incompleto.');
+    return;
+  }
+  if (!confirm(`Restaurar backup de ${dados.data ? new Date(dados.data).toLocaleString('pt-BR') : '(data desconhecida)'}?\n\nIsso vai substituir o histórico e os preços atuais deste aparelho.`)) return;
+
+  saveMats(dados.mats);
+  saveHist(dados.hist);
+  mats = loadMats();
+  document.getElementById('backupIn').value = '';
+  renderCompra();
+  alert('✅ Backup restaurado com sucesso!');
+}
+
+document.getElementById('hDate').textContent =
+  new Date().toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+
+// ============================================================
+// COMPRA — RENDER
+// ============================================================
+function renderCompra() {
+  document.getElementById('compraDate').value = ca.date || today();
+  document.getElementById('compraNome').value = ca.nome || '';
+  const container = document.getElementById('materiaisCompra');
+  container.innerHTML = '';
+
+  mats.forEach(mat => {
+    const bags  = ca.bags[mat.id] || [];
+    const soma  = bags.reduce((a,b)=>a+pf(b), 0);
+    const sub   = soma * mat.preco;
+    const cnt   = bags.filter(b=>pf(b)>0).length;
+    const pill  = cnt>0
+      ? `<span class="pill">${cnt} bag${cnt>1?'s':''}</span>`
+      : `<span class="pill empty">vazio</span>`;
+
+    const div = document.createElement('div');
+    div.className = 'mat-block';
+    div.id = 'blk-'+mat.id;
+    div.innerHTML = `
+      <div class="mat-header" onclick="toggleBlk('${mat.id}')">
+        <div>
+          <div class="mat-header-name">${mat.nome}${pill}</div>
+          <div class="mat-header-price">R$ ${mat.preco.toFixed(2).replace('.',',')} / kg</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="mat-total" id="sub-${mat.id}">${sub>0?R$(sub):'—'}</span>
+          <span class="chevron" id="chv-${mat.id}">▶</span>
+        </div>
+      </div>
+      <div class="mat-body" id="bdy-${mat.id}" style="display:none;">
+        <div class="section-label">Bags</div>
+        <div id="bags-${mat.id}">
+          ${bags.map((b,i)=>bagHTML(mat.id,i,b)).join('')}
+        </div>
+        <div class="add-bag-row">
+          <input type="number" id="nb-${mat.id}" placeholder="Peso do bag (kg)" step="0.01" min="0"
+            onkeydown="if(event.key==='Enter')addBag('${mat.id}')">
+          <button class="btn" onclick="addBag('${mat.id}')">+ Bag</button>
+        </div>
+        <div class="bag-sum-row" id="bsr-${mat.id}" style="${bags.length?'':'display:none'}">
+          <span class="bag-sum-label" id="bsl-${mat.id}">
+            Total: <strong>${soma.toFixed(2).replace('.',',')} kg</strong>
+            × R$ ${mat.preco.toFixed(2).replace('.',',')} =
+          </span>
+          <span class="bag-sum-val">${R$(sub)}</span>
+        </div>
+      </div>`;
+    container.appendChild(div);
+  });
+  renderDevs();
+  updateTotal();
+}
+
+function bagHTML(mid, i, v) {
+  return `<div class="bag-item">
+    <span class="bag-num">${i+1}.</span>
+    <input type="number" value="${v}" step="0.01" min="0"
+      oninput="updBag('${mid}',${i},this.value)"
+      onchange="updBag('${mid}',${i},this.value)">
+    <button class="bag-del" onclick="delBag('${mid}',${i})">✕</button>
+  </div>`;
+}
+
+function toggleBlk(id) {
+  const b = document.getElementById('bdy-'+id);
+  const c = document.getElementById('chv-'+id);
+  const open = b.style.display!=='none';
+  b.style.display = open?'none':'block';
+  c.classList.toggle('open',!open);
+}
+
+function openBlk(id) {
+  document.getElementById('bdy-'+id).style.display='block';
+  document.getElementById('chv-'+id).classList.add('open');
+}
+
+function addBag(mid) {
+  const inp = document.getElementById('nb-'+mid);
+  const v   = pf(inp.value);
+  if (!inp.value || v<0) return;
+  if (!ca.bags[mid]) ca.bags[mid]=[];
+  ca.bags[mid].push(v);
+  inp.value='';
+  saveCA();
+  renderCompra();
+  openBlk(mid);
+}
+
+function delBag(mid, i) {
+  ca.bags[mid].splice(i,1);
+  saveCA();
+  renderCompra();
+  openBlk(mid);
+}
+
+function updBag(mid, i, val) {
+  ca.bags[mid][i] = pf(val);
+  saveCA();
+  // atualizar somente o subtotal inline
+  const mat   = mats.find(m=>m.id===mid);
+  const bags  = ca.bags[mid];
+  const soma  = bags.reduce((a,b)=>a+pf(b),0);
+  const sub   = soma*mat.preco;
+  const bsr   = document.getElementById('bsr-'+mid);
+  const bsl   = document.getElementById('bsl-'+mid);
+  if (bsr) { bsr.style.display=bags.length?'flex':'none'; }
+  if (bsl) { bsl.innerHTML=`Total: <strong>${soma.toFixed(2).replace('.',',')} kg</strong> × R$ ${mat.preco.toFixed(2).replace('.',',')} =`; }
+  const subEl = document.getElementById('sub-'+mid);
+  if (subEl) subEl.textContent = sub>0?R$(sub):'—';
+  updateTotal();
+}
+
+// ============================================================
+// DEVOLUÇÕES
+// ============================================================
+function renderDevs() {
+  const devs   = ca.devs||[];
+  const total  = devs.reduce((a,d)=>a+pf(d.v),0);
+  const lista  = document.getElementById('devLista');
+  const label  = document.getElementById('devTotalLabel');
+  if (label) label.textContent = `− ${R$(total)}`;
+  if (!lista) return;
+  if (!devs.length) {
+    lista.innerHTML='<div style="font-size:.8rem;color:var(--text-dim);padding:4px 0 6px;">Nenhuma devolução registrada.</div>';
+    return;
+  }
+  lista.innerHTML = devs.map((d,i)=>`
+    <div class="dev-item">
+      <span>${d.n}</span>
+      <span class="dev-item-val">− ${R$(pf(d.v))}</span>
+      <button class="dev-item-del" onclick="delDev(${i})">✕</button>
+    </div>`).join('');
+}
+
+function addDev() {
+  const n = document.getElementById('devNome').value.trim();
+  const v = pf(document.getElementById('devValor').value);
+  if (!n) { document.getElementById('devNome').focus(); return; }
+  if (!v||v<=0) { document.getElementById('devValor').focus(); return; }
+  if (!ca.devs) ca.devs=[];
+  ca.devs.push({n,v});
+  document.getElementById('devNome').value='';
+  document.getElementById('devValor').value='';
+  saveCA();
+  renderDevs();
+  updateTotal();
+}
+
+function delDev(i) {
+  ca.devs.splice(i,1);
+  saveCA();
+  renderDevs();
+  updateTotal();
+}
+
+// ============================================================
+// TOTAL BAR
+// ============================================================
+function updateTotal() {
+  let bruto = 0, bags = 0;
+  mats.forEach(m => {
+    const b = ca.bags[m.id]||[];
+    bruto += b.reduce((a,x)=>a+pf(x),0)*m.preco;
+    bags  += b.filter(x=>pf(x)>0).length;
+  });
+  const totalDev = (ca.devs||[]).reduce((a,d)=>a+pf(d.v),0);
+  const liq      = bruto - totalDev;
+
+  document.getElementById('totalGeral').textContent = R$(bruto);
+  const liqEl    = document.getElementById('totalLiq');
+  const liqLbl   = document.getElementById('totalLiqLabel');
+  const barLbl   = document.getElementById('totalBarLabel');
+
+  if (totalDev>0) {
+    liqEl.style.display='block';  liqEl.textContent=`Líquido: ${R$(liq)}`;
+    liqLbl.style.display='block'; liqLbl.textContent=`− ${R$(totalDev)} em devoluções`;
+    barLbl.textContent='Total bruto';
+  } else {
+    liqEl.style.display='none';
+    liqLbl.style.display='none';
+    barLbl.textContent=`Total · ${bags} bag${bags!==1?'s':''}`;
+  }
+}
+
+// ============================================================
+// LIMPAR / SALVAR
+// ============================================================
+function limparCompra() {
+  if (!confirm('Limpar tudo da compra atual?')) return;
+  ca = newCA();
+  saveCA();
+  renderCompra();
+}
+
+function salvarCompra() {
+  ca.date = document.getElementById('compraDate').value || today();
+  ca.nome = document.getElementById('compraNome').value.trim();
+  if (!ca.nome) { alert('⚠️ Informe o nome da folha.'); document.getElementById('compraNome').focus(); return; }
+
+  let bruto=0, dets=[], ok=false;
+  mats.forEach(m => {
+    const bags = (ca.bags[m.id]||[]).filter(b=>pf(b)>0);
+    if (!bags.length) return;
+    ok=true;
+    const soma = bags.reduce((a,b)=>a+pf(b),0);
+    const sub  = soma*m.preco;
+    bruto += sub;
+    dets.push({nome:m.nome, bags, soma, preco:m.preco, sub});
+  });
+  if (!ok) { alert('Nenhum bag registrado.'); return; }
+
+  const devs    = ca.devs||[];
+  const totalDev= devs.reduce((a,d)=>a+pf(d.v),0);
+  const liq     = bruto-totalDev;
+
+  const h = loadHist();
+  h.unshift({id:Date.now(), date:ca.date, nome:ca.nome, bruto, totalDev, liq, dets, devs:[...devs]});
+  saveHist(h);
+
+  const nomeSalvo=ca.nome, brutoSalvo=bruto;
+  ca = newCA(); saveCA(); renderCompra();
+  alert(`✅ Folha "${nomeSalvo}" salva!\nTotal bruto: ${R$(brutoSalvo)}${totalDev>0?`\nDevoluções: − ${R$(totalDev)}\nLíquido: ${R$(liq)}`:''}`);
+}
+
+// ============================================================
+// COMPARTILHAR WHATSAPP
+// ============================================================
+function buildMsg(h) {
+  let t = `🗂 *RF RECICLAGEM*\n👤 *${h.nome}*\n📅 ${fmtD(h.date)}\n${'─'.repeat(18)}\n`;
+  h.dets.forEach(d => {
+    t += `\n📦 *${d.nome}*\n`;
+    d.bags.forEach((b,i)=>{ t+=`  Bag ${i+1}: ${pf(b).toFixed(2).replace('.',',')} kg\n`; });
+    t += `  Subtotal: ${d.soma.toFixed(2).replace('.',',')} kg × R$ ${d.preco.toFixed(2).replace('.',',')} = *${R$(d.sub)}*\n`;
+  });
+  t += `\n${'─'.repeat(18)}\n💰 Total bruto: *${R$(h.bruto)}*`;
+  if (h.devs&&h.devs.length) {
+    t += `\n\n↩️ *Devoluções:*\n`;
+    h.devs.forEach(d=>{ t+=`  ${d.n}: − ${R$(pf(d.v))}\n`; });
+    t += `\n✅ *LÍQUIDO A PAGAR: ${R$(h.liq)}*`;
+  } else {
+    t += `\n✅ *TOTAL A PAGAR: ${R$(h.bruto)}*`;
+  }
+  return t;
+}
+
+function waOpen(msg) { window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank'); }
+
+function compartilharAtual() {
+  let bruto=0, dets=[], ok=false;
+  mats.forEach(m => {
+    const bags=(ca.bags[m.id]||[]).filter(b=>pf(b)>0);
+    if (!bags.length) return; ok=true;
+    const soma=bags.reduce((a,b)=>a+pf(b),0);
+    const sub=soma*m.preco; bruto+=sub;
+    dets.push({nome:m.nome,bags,soma,preco:m.preco,sub});
+  });
+  if (!ok) { alert('Nenhum bag para compartilhar.'); return; }
+  const devs=(ca.devs||[]);
+  const totalDev=devs.reduce((a,d)=>a+pf(d.v),0);
+  const h={nome:ca.nome||'(rascunho)',date:ca.date||today(),bruto,totalDev,liq:bruto-totalDev,dets,devs};
+  waOpen(buildMsg(h));
+}
+
+function waHist(id) {
+  const h = loadHist().find(x=>x.id===id);
+  if (h) waOpen(buildMsg(h));
+}
+
+// ============================================================
+// PREÇOS
+// ============================================================
+function renderPrecos() {
+  const c = document.getElementById('precosLista');
+  c.innerHTML='';
+  mats.forEach(m=>{
+    const row=document.createElement('div');
+    row.className='mat-row-price';
+    row.innerHTML=`
+      <div><div class="mat-header-name">${m.nome}</div><div class="mat-tag" style="font-size:.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;">por kg</div></div>
+      <div style="font-size:.85rem;color:var(--text-dim);">R$</div>
+      <input type="number" class="price-input" value="${m.preco.toFixed(2)}" step="0.01" min="0" id="pc-${m.id}">`;
+    c.appendChild(row);
+  });
+}
+
+function salvarPrecos() {
+  mats.forEach(m=>{ m.preco=pf(document.getElementById('pc-'+m.id).value); });
+  saveMats(mats);
+  renderCompra();
+  alert('✅ Preços salvos!');
+}
+
+// ============================================================
+// HISTÓRICO
+// ============================================================
+function renderHist() {
+  const hist=loadHist();
+  const c=document.getElementById('historicoLista');
+  if (!hist.length) { c.innerHTML='<div class="empty">Nenhuma compra registrada ainda.</div>'; return; }
+  c.innerHTML=hist.map(h=>{
+    const devs=h.devs||[];
+    const hasDev=devs.length>0;
+    return `<div class="hist-item">
+      <div class="hist-header">
+        <div>
+          <div class="hist-nome">👤 ${h.nome||'(sem nome)'}</div>
+          <div class="hist-date">📅 ${fmtD(h.date)}</div>
+          <div style="font-size:.78rem;color:var(--text-dim);margin-top:3px;">${h.dets.length} material(is)</div>
+        </div>
+        <div>
+          <div class="hist-total">${R$(h.bruto)}</div>
+          ${hasDev?`<div class="hist-liq">Líquido: ${R$(h.liq)}</div>`:''}
+        </div>
+      </div>
+      <div class="subtotal-section">
+        ${h.dets.map(d=>`<div class="sub-row">
+          <span class="lbl">${d.nome} · ${d.soma.toFixed(2).replace('.',',')} kg × R$ ${d.preco.toFixed(2).replace('.',',')}</span>
+          <span>${R$(d.sub)}</span>
+        </div>`).join('')}
+        <div class="sub-row total">
+          <span class="lbl">Total bruto</span><span>${R$(h.bruto)}</span>
+        </div>
+        ${hasDev?`
+        <div class="dev-divider"></div>
+        ${devs.map(d=>`<div class="sub-row dev-row">
+          <span class="lbl">↩️ ${d.n}</span>
+          <span>− ${R$(pf(d.v))}</span>
+        </div>`).join('')}
+        <div class="sub-row liq-row">
+          <span class="lbl">LÍQUIDO A PAGAR</span><span>${R$(h.liq)}</span>
+        </div>`:''}
+      </div>
+      <div class="hist-actions">
+        <button class="btn wapp" onclick="waHist(${h.id})">${WA_SVG}Enviar WhatsApp</button>
+        <button class="btn red" onclick="delHist(${h.id})">🗑 Excluir</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function delHist(id) {
+  if (!confirm('Excluir esta compra?')) return;
+  saveHist(loadHist().filter(h=>h.id!==id));
+  renderHist();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.getElementById('compraDate').addEventListener('change', function(){
+  ca.date=this.value; saveCA();
+});
+
+renderCompra();
+document.getElementById('totalBar').style.display='flex';
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(r => console.log('SW registrado:', r.scope))
+      .catch(e => console.log('SW erro:', e));
+  });
+}
+</script>
+</body>
+</html>
